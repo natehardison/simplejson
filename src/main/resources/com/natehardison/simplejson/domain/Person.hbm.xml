@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <!--
+    	We'll model the Person/Owner hierarchy using just one table, since there's
+    	total overlap between their columns (the one exception being the needed
+    	"discriminator" column). We do this by marking the Owner as a "subclass"
+    	instead of a "joined-subclass" on the ID field.
+     -->
+	<class name="com.natehardison.simplejson.domain.Person" table="PERSON" discriminator-value="Person">
+		<id name="id" type="long">
+			<column name="ID" />
+			<!-- Have Hibernate auto-generate this field, incrementing as it goes -->
+			<generator class="increment" />
+		</id>
+		<!-- Allows Hibernate to distinguish a Person row from an Owner row -->
+		<discriminator type="string">
+			<column name="DISCR_COL" />
+		</discriminator>
+		<property name="name" type="java.lang.String" not-null="true">
+			<column name="NAME" />
+		</property>
+		<property name="age" type="int" not-null="true">
+			<column name="AGE" check="AGE >= 0" />
+		</property>
+		<subclass name="com.natehardison.simplejson.domain.Owner" discriminator-value="Owner" lazy="false">
+		    <!--
+		    	Sets up a column in the VEHICLE table to hold an OWNER_ID field,
+		    	which will be a foreign key. Marking this relationship as not
+		    	"inverse" means that we won't be able to get at a vehicle's
+		    	owner (we do this for simplicity). Also for simplicity, we turn
+		    	off lazy loading.
+		     -->
+			<set name="vehicles" table="VEHICLE" inverse="false" lazy="false">
+				<key column="OWNER_ID" />
+				<one-to-many class="com.natehardison.simplejson.domain.Vehicle" />
+			</set>
+		</subclass>
+	</class>
+</hibernate-mapping>

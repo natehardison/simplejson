@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <!--
+     	We'll model the Vehicle/Car/Truck hierarchy as three separate tables
+     	since each has distinct fields. This is done by making Car and Truck
+     	each a "joined-subclass" of Vehicle, keyed on the VIN.
+     -->
+	<class name="com.natehardison.simplejson.domain.Vehicle" table="VEHICLE" abstract="true">
+		<id name="vin" type="java.lang.String">
+			<column name="VIN" />
+			<!-- The VIN should be assigned by the creator. -->
+			<generator class="assigned" />
+		</id>
+		<property name="fuelConsumption" type="int" not-null="true">
+			<column name="FUELCONSUMPTION" check="FUELCONSUMPTION > 0" />
+		</property>
+		<property name="horsepower" type="int" not-null="true">
+			<column name="HORSEPOWER" check="HORSEPOWER > 0" />
+		</property>
+		<property name="speed" type="int" not-null="true">
+			<column name="SPEED" check="SPEED > 0" />
+		</property>
+		<joined-subclass name="com.natehardison.simplejson.domain.Car" table="CAR" lazy="false">
+		    <key column="VIN" />
+			<property name="doors" type="int" not-null="true">
+				<column name="DOORS" check="DOORS > 0" />
+			</property>
+		</joined-subclass>
+		<joined-subclass name="com.natehardison.simplejson.domain.Truck" table="TRUCK" lazy="false">
+		    <key column="VIN" />
+			<property name="axles" type="int" not-null="true">
+				<column name="AXLES" check="AXLES > 0" />
+			</property>
+		</joined-subclass>
+	</class>
+</hibernate-mapping>
